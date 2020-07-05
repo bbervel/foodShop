@@ -30,7 +30,7 @@ window.addEventListener('DOMContentLoaded',() =>{
         }
     });
 
-    let sellOfferEnds = new Date('2020-06-20');
+    let sellOfferEnds = new Date('2020-08-20');
     
         function countOfferTime(){
             let days = document.getElementById('days'),
@@ -68,8 +68,7 @@ window.addEventListener('DOMContentLoaded',() =>{
 let timerLoop = setInterval(countOfferTime, 1);
 //Modal
 let modalBtns = document.querySelectorAll('[data-modal]'),
-    modalWindow = document.querySelector('.modal'),
-    modalClose = document.querySelector('[data-close]');
+    modalWindow = document.querySelector('.modal');
     
     modalBtns.forEach(item =>{
         item.addEventListener('click', (event) =>{
@@ -80,7 +79,7 @@ let modalBtns = document.querySelectorAll('[data-modal]'),
         });
     });
     function modalOpen(){
-        modalWindow.classList.toggle('show');
+        modalWindow.classList.add('show');
         document.body.style.overflow = 'hidden';
     }
     function modalCloseF(){
@@ -91,10 +90,10 @@ let modalBtns = document.querySelectorAll('[data-modal]'),
         clearInterval(modalTimeOut);
     }
 
-    modalClose.addEventListener('click',modalCloseF);
+    //modalClose.addEventListener('click',modalCloseF);
 
     modalWindow.addEventListener('click', event => {
-        if(event.target === modalWindow){
+        if(event.target === modalWindow || event.target.getAttribute('data-close') ==''){//getAttribute добавлено что бы соытие работало даже на динамически созданном элементе
             //modalWindow.classList.add('hide');
             //modalWindow.classList.remove('show');
             modalCloseF();
@@ -109,7 +108,7 @@ let modalBtns = document.querySelectorAll('[data-modal]'),
         }
     });
     
-    let modalTimeOut = setTimeout(modalOpen,500000);
+    let modalTimeOut = setTimeout(modalOpen,50000);
 
     function modalByPageBottom(){
         if(window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight){
@@ -139,7 +138,7 @@ class shopItem{
     }
     render(){
         let item = document.createElement('div');
-        if(this.classes.length>0){
+        if(this.classes. length>0){
             this.classes.forEach(className => item.classList.add(className));
         } else {
             item.classList.add('menu__item');
@@ -185,11 +184,140 @@ new shopItem('.menu .container',
             'menu__item'
         ).render();
 
+// обработка форм FormData
+
+let forms = document.querySelectorAll('form');
+forms.forEach((item)=>{
+    formSent(item);
+});
+
+let formSendStatusMsg = {
+    loading: '<center><img src="../img/form/spinner.svg"></center>',
+    succsess: 'Супер! Мы позвоним в ближайшее время!',
+    error: 'Что-то пошло не так. Попробуйте позже'
+};
+/*
+function formSent(form){
+    form.addEventListener('submit',(e)=>{
+        e.preventDefault();
+        const request = new XMLHttpRequest();
+        request.open('POST', 'server.php');
+        let data = new FormData(form);
+        request.send(data);
+        let formSendStatusMsgDiv = document.createElement('div');
+        formSendStatusMsgDiv.classList.add('status');
+        formSendStatusMsgDiv.textContent = formSendStatusMsg.loading;
+        form.append(formSendStatusMsgDiv);
+        
+        request.addEventListener('load',()=>{
+            if(request.status === 200){
+                console.log(request.response);
+                formSendStatusMsgDiv.textContent = formSendStatusMsg.succsess;
+            } else {
+                formSendStatusMsgDiv.textContent = formSendStatusMsg.error;
+            }
+        });
+    });
+}
 
 
+// обработка форм JSON
 
+function formSent(form){
+    form.addEventListener('submit',(e)=>{
+        e.preventDefault();
+        const request = new XMLHttpRequest();
+        request.open('POST', 'server.php');
+        let data = new FormData(form);
+        let newData = {};
+        data.forEach((item,key)=>{
+            newData[key]=item;
+        });
+        let dataJson = JSON.stringify(newData);
+        request.setRequestHeader('Content-type','application/json','charset=utf-8');
+        request.send(dataJson);
+        let formSendStatusMsgDiv = document.createElement('div');
+        formSendStatusMsgDiv.classList.add('status');
+        formSendStatusMsgDiv.innerHTML = formSendStatusMsg.loading;
+        form.append(formSendStatusMsgDiv);
+        request.addEventListener('load',(event)=>{
+            if(request.status === 200){
+                form.reset();
+                console.log(request.response);
+                thankYouModal(formSendStatusMsg.succsess);
+                formSendStatusMsgDiv.innerHTML = '';
+            } else {
+                thankYouModal(formSendStatusMsg.error);
+            }
+        });
+    });
+}
+*/
+// отправка данных fetch();
 
+function formSent(form){
+    form.addEventListener('submit',(e)=>{
+        e.preventDefault();
+        let data = new FormData(form);
+        let newData = {};
+        data.forEach((item,key)=>{
+            newData[key]=item;
+        });
+        fetch('server.php',{
+            method: 'POST',
+            body: JSON.stringify(newData),
+            headers: {
+                'Content-type':'application/json;charset=utf-8',
+            }
+        })  
+            .then(response => response.text())
+            .then(response => {
+                console.log(response);
+                thankYouModal(formSendStatusMsg.succsess);
+                formSendStatusMsgDiv.innerHTML = '';
+            })
+            .catch(() => {
+                thankYouModal(formSendStatusMsg.error)
+            })
+            .finally(()=> {form.reset()
+            });
+        
+        let formSendStatusMsgDiv = document.createElement('div');
+        formSendStatusMsgDiv.classList.add('status');
+        formSendStatusMsgDiv.innerHTML = formSendStatusMsg.loading;
+        form.append(formSendStatusMsgDiv);
+        /*request.addEventListener('load',(event)=>{
+            if(request.status === 200){
+                
+                
 
+                
+            } else {
+                
+            }
+        });*/
+    });
+}
+
+function thankYouModal(msg){
+    let prevModalDialog = document.querySelector('.modal__content');
+    prevModalDialog.classList.add('hide');
+    modalOpen();
+    let statusDiv = document.createElement('div');
+    statusDiv.classList.add('modal__content');
+    document.querySelector('.modal__dialog').append(statusDiv);
+    statusDiv.innerHTML = `
+        <div data-close class="modal__close">&times;</div>
+        <div class="modal__title">${msg}</div>
+    `;
+    prevModalDialog.classList.add('hide');
+    
+    setTimeout(()=>{
+        statusDiv.remove();
+        prevModalDialog.classList.remove('hide');
+        modalCloseF();
+    }, 2000);
+}
 
 
 
