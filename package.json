@@ -1,0 +1,26 @@
+{
+  "name": "foodshop",
+  "version": "1.0.0",
+  "description": "Тестовый проект, обучение",
+  "main": "index.js",
+  "scripts": {
+    "test": "testnpm"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bbervel/foodShop.git"
+  },
+  "keywords": [
+    "обучение",
+    "тестовый"
+  ],
+  "author": "Березинский П.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bbervel/foodShop/issues"
+  },
+  "homepage": "https://github.com/bbervel/foodShop#readme",
+  "devDependencies": {
+    "json-server": "^0.16.1"
+  }
+}
